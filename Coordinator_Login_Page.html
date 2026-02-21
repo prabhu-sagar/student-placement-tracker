@@ -214,7 +214,7 @@ body::after{
 
         <h2>Coordinator Login</h2>
 
-        <form>
+        <form id="coLoginForm">
             <div class="input-box">
                 <label>Coordinator ID</label>
                 <input type="text" placeholder="Enter ID" required>
@@ -245,6 +245,29 @@ body::after{
     </div>
 </div>
 
+<script>
+document.getElementById("coLoginForm").addEventListener("submit", async function(e){
+    e.preventDefault()
+
+    const email = document.querySelector("input[type='text']").value
+    const password = document.querySelector("input[type='password']").value
+
+    const res = await fetch("http://localhost:5000/api/auth/login",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ email, password })
+    })
+
+    const data = await res.json()
+
+    if(data.token && data.role === "coordinator"){
+        localStorage.setItem("token", data.token)
+        window.location.href = "coordinator_dashboard.html"
+    }else{
+        alert("Not Coordinator or Invalid Credentials")
+    }
+})
+</script>
 
 </body>
 </html>

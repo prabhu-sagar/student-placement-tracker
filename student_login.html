@@ -221,19 +221,19 @@ body::after{
     <h2>Student Login</h2>
 
     <!-- Login Form -->
-    <form>
+    <form id="loginForm">
 
-      <!-- Student ID -->
-      <div class="input-box">
-        <label>Student ID</label>
-        <input type="text" placeholder="Enter Student ID" required>
-      </div>
+      <!-- Email -->
+<div class="input-box">
+  <label>Email</label>
+  <input type="email" id="email" placeholder="Enter Email" required>
+</div>
 
       <!-- Password -->
-      <div class="input-box">
-        <label>Password</label>
-        <input type="password" placeholder="Enter Password" required>
-      </div>
+<div class="input-box">
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Enter Password" required>
+</div>
 
       <!-- Forgot Password -->
       <div class="forgot">
@@ -242,7 +242,12 @@ body::after{
 
       <!-- Login Button -->
       <button class="btn">Login</button>
-
+     
+      <!--if not registerd-->
+      <p style="margin-top:15px;">
+          Don't have account?
+         <a href="student_register.html" style="color:#2a5298;">Register Here</a>
+      </p>
     </form>
 
   </div>
@@ -259,7 +264,34 @@ body::after{
         <a href="#">Contact</a>
     </div>
 </div>
+  
+  <!--java sc connect with backend-->
+     <script>
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+    e.preventDefault()
 
+    const email = document.getElementById("email").value
+const password = document.getElementById("password").value
+
+    const res = await fetch("http://localhost:5000/api/auth/login",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ email, password })
+    })
+
+    const data = await res.json()
+
+    if(data.token){
+        localStorage.setItem("token", data.token)
+
+        if(data.role === "student"){
+            window.location.href = "student_dashboard.html"
+        }
+    }else{
+        alert(data.message)
+    }
+})
+</script> 
 
 </body>
 </html>

@@ -220,16 +220,16 @@ body::after{
 
         <h2>Admin Login</h2>
 
-        <form>
+        <form id="adminLoginForm">
             <div class="input-box">
                 <label>Admin ID</label>
-                <input type="text" placeholder="Enter ID" required>
-            </div>
+                <input type="text" id="email" placeholder="Enter ID" required>
+              </div>
 
             <div class="input-box">
                 <label>Password</label>
-                <input type="password" placeholder="Enter Password" required>
-            </div>
+                <input type="password" id="password" placeholder="Enter Password" required>
+             </div>
             <div class="forgot">
                 <a href="#">Forgot Password?</a>
             </div>
@@ -250,6 +250,29 @@ body::after{
     </div>
 </div>
 
+<script>
+document.getElementById("adminLoginForm").addEventListener("submit", async function(e){
+    e.preventDefault()
+
+    const email = document.getElementById("email").value
+const password = document.getElementById("password").value
+
+    const res = await fetch("http://localhost:5000/api/auth/login",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ email, password })
+    })
+
+    const data = await res.json()
+
+    if(data.token && data.role === "admin"){
+        localStorage.setItem("token", data.token)
+        window.location.href = "admin_dashboard.html"
+    }else{
+        alert("Not Admin or Invalid Credentials")
+    }
+})
+</script>
 
 </body>
 
