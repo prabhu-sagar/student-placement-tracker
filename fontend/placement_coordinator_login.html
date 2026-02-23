@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Placement Coordinator Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Page */
+body{
+    height:100vh;
+    overflow:hidden;
+}
+
+/* 🎥 Background video */
+video{
+    position:fixed;
+    top:0;
+    left:0;
+    min-width:100%;
+    min-height:100%;
+    object-fit:cover;
+    z-index:-2;
+}
+
+/* dark layer */
+body::after{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.3);
+    z-index:-1;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:60px;
+    background:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 25px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+    z-index:2;
+}
+.header .logo a{
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 600;
+    color: #5a2ca0;   /* change if needed */
+}
+
+
+.logo{
+    font-size:18px;
+    font-weight:bold;
+    color:#2a5298;
+}
+
+.nav-links a{
+    margin:0 10px;
+    text-decoration:none;
+    color:#333;
+    font-weight:500;
+}
+
+.login-buttons a{
+    margin-left:10px;
+    padding:7px 12px;
+    background:#2a5298;
+    color:white;
+    text-decoration:none;
+    border-radius:5px;
+    font-size:14px;
+}
+
+/* ================= LOGIN ================= */
+
+.main{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.login-section{
+    width:350px;
+    padding:30px;
+    background:rgba(255,255,255,0.95);
+    border-radius:10px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    text-align:center;
+}
+
+/* User image */
+.user-img{
+    margin-bottom:10px;
+}
+
+.user-img img{
+    width:90px;
+    height:90px;
+}
+
+.login-section h2{
+    margin-bottom:20px;
+    color:#2a5298;
+}
+
+.input-box{
+    margin-bottom:15px;
+    text-align:left;
+}
+
+.input-box label{
+    font-weight:bold;
+    display:block;
+    margin-bottom:5px;
+}
+
+.input-box input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+.forgot{
+    text-align:right;
+    margin-bottom:15px;
+}
+
+.forgot a{
+    text-decoration:none;
+    color:#2a5298;
+    font-size:14px;
+}
+
+.btn{
+    width:100%;
+    padding:10px;
+    background:#2a5298;
+    border:none;
+    color:white;
+    font-size:16px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#1e3c72;
+}
+
+/* error */
+#error{
+    color:red;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+/* ================= FOOTER ================= */
+.footer{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    height:45px;
+    background:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 20px;
+    box-shadow:0 -2px 10px rgba(0,0,0,0.2);
+    font-size:14px;
+    z-index:2;
+}
+
+.footer a{
+    margin-left:10px;
+    text-decoration:none;
+    color:#2a5298;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🎥 Background Video -->
+<video autoplay muted loop>
+    <source src="placement.mp4" type="video/mp4">
+</video>
+
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+    <div class="logo">
+        <a href="home_page.html">🎓 Student Placement Tracker</a>
+    </div>
+
+    <div class="nav-links">
+        <a href="home_page.html">Home</a>
+        <a href="statistics.html">Statistics</a>
+        <a href="companies.html">Companies</a>
+    </div>
+</div>
+
+
+<!-- ================= LOGIN ================= -->
+<div class="main">
+    <div class="login-section">
+
+        <div class="user-img">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="user">
+        </div>
+
+        <h2>Coordinator Login</h2>
+
+        <!-- error message -->
+        <div id="error"></div>
+
+        <!-- 🔥 ONLY CHANGE: function login -->
+        <form onsubmit="login(event)">
+            <div class="input-box">
+                <label>Coordinator ID</label>
+                <input type="text" id="username" required>
+            </div>
+
+            <div class="input-box">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+
+            <div class="forgot">
+                <a href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+        </form>
+
+    </div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<div class="footer">
+    <div>© 2026 Student Placement Tracker</div>
+    <div>Developed for Campus Recruitment System</div>
+    <div>
+        <a href="home_page.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </div>
+</div>
+
+<!-- 🔥 LOGIN CONNECTION TO ADMIN -->
+<script>
+function login(e){
+    e.preventDefault();
+
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    const coordinators = JSON.parse(localStorage.getItem("coordinators")) || [];
+
+    const match = coordinators.find(c => c.id === user && c.pass === pass);
+
+    if(match){
+        localStorage.setItem("isCoordinatorLoggedIn", "true");
+        localStorage.setItem("coordinatorName", match.name);
+        window.location.href = "coordinator_dashboard.html";
+    }
+    else{
+        document.getElementById("error").innerText = "Invalid Coordinator ID or Password ❌";
+    }
+}
+</script>
+
+</body>
+</html>
