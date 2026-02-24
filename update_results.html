@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Update Results</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    display:flex;
+    min-height:100vh;
+    background: linear-gradient(90deg,#3b82f6,#6366f1,#a855f7);
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background: linear-gradient(180deg,#3b82f6,#1e40af);
+    padding:30px 20px;
+    color:white;
+}
+
+.sidebar h2{
+    margin-bottom:30px;
+    font-size:22px;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar ul li{
+    margin-bottom:15px;
+}
+
+.sidebar ul li a{
+    text-decoration:none;
+    color:white;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-radius:14px;
+    transition:0.3s;
+}
+
+.sidebar ul li a:hover{
+    background:rgba(255,255,255,0.18);
+}
+
+.sidebar ul li a.active{
+    background:rgba(255,255,255,0.28);
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    margin:20px;
+    padding:30px;
+    background:#f4f6fb;
+    border-radius:25px;
+    position: relative;
+}
+
+/* Top-right logout button */
+.top-right {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.top-right button {
+    background: #ef4444; /* Red color for logout */
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.top-right button:hover {
+    background: #dc2626; /* Darker red on hover */
+}
+
+.header{
+    margin-bottom:25px;
+}
+
+.table-container{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 6px 15px rgba(0,0,0,0.1);
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:12px;
+    text-align:left;
+    border-bottom:1px solid #ddd;
+}
+
+th{
+    background:#3f7ad6;
+    color:white;
+}
+
+select{
+    padding:6px;
+    border-radius:6px;
+}
+
+button.update-btn{
+    padding:6px 12px;
+    background:#3f7ad6;
+    border:none;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button.update-btn:hover{
+    background:#2f6fd1;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Placement Portal</h2>
+    <ul>
+        <li><a href="coordinator_dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="schedule_drives.html"><i class="fas fa-calendar-alt"></i> Schedule Drive</a></li>
+        <li><a href="verify_eligibility.html"><i class="fas fa-check"></i> Verify Eligibility</a></li>
+        <li><a href="update_results.html" class="active"><i class="fas fa-bullhorn"></i> Update Results</a></li>
+    </ul>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- Logout button top-right -->
+    <div class="top-right">
+        <button onclick="logout()">Logout <i class="fas fa-sign-out-alt"></i></button>
+    </div>
+
+    <div class="header">
+        <h1>Update Placement Results</h1>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Package</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="resultTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+let appliedDrives = JSON.parse(localStorage.getItem("appliedDrives")) || [];
+let table = document.getElementById("resultTable");
+
+if(appliedDrives.length === 0){
+    table.innerHTML = "<tr><td colspan='8'>No applications found</td></tr>";
+}
+else{
+    appliedDrives.forEach((drive,index)=>{
+        table.innerHTML += `
+        <tr>
+            <td>${drive.studentName}</td>
+            <td>${drive.studentId}</td>
+            <td>${drive.company}</td>
+            <td>${drive.role}</td>
+            <td>${drive.package}</td>
+            <td>${drive.date}</td>
+            <td>
+                <select id="status${index}">
+                    <option ${drive.status=="Pending"?"selected":""}>Pending</option>
+                    <option ${drive.status=="Selected"?"selected":""}>Selected</option>
+                    <option ${drive.status=="Rejected"?"selected":""}>Rejected</option>
+                </select>
+            </td>
+            <td>
+                <button class="update-btn" onclick="updateStatus(${index})">Update</button>
+            </td>
+        </tr>
+        `;
+    });
+}
+
+function updateStatus(index){
+    let newStatus = document.getElementById("status"+index).value;
+    appliedDrives[index].status = newStatus;
+    localStorage.setItem("appliedDrives", JSON.stringify(appliedDrives));
+    alert("Status Updated Successfully!");
+    location.reload();
+}
+
+function logout(){
+    // Optional: clear user data if needed
+    // localStorage.removeItem("appliedDrives");
+    window.location.href = "placement_coordinator_login.html"; // Redirect to login page
+}
+</script>
+
+</body>
+</html>
