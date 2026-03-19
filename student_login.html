@@ -187,7 +187,7 @@ body::after{
 <div class="header">
     <div class="logo">🎓 Student Placement Tracker</div>
     <div class="nav-links">
-        <a href="index.html">Home</a>
+        <a href="home_page.html">Home</a>
         <a href="statistics.html">Statistics</a>
         <a href="companies.html">Companies</a>
     </div>
@@ -235,7 +235,7 @@ body::after{
     <div>© 2026 Student Placement Tracker</div>
     <div class="footer-center">Developed for Campus Recruitment System</div>
     <div>
-        <a href="index.html">Home</a>
+        <a href="home_page.html">Home</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
     </div>
@@ -244,40 +244,44 @@ body::after{
 <!-- ================= JS ================= -->
 <!-- ================= JS ================= -->
 <script>
-document.getElementById("loginForm").addEventListener("submit", function(e){
+document.getElementById("loginForm").addEventListener("submit", async function(e){
     e.preventDefault();
 
     const studentId = document.getElementById("studentId").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    // Get all registered students
-    let students = JSON.parse(localStorage.getItem("students")) || [];
+    try {
 
-    console.log("All Registered Students:", students); // Debug
+        const response = await fetch("http://localhost:5000/student_login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ studentId, password })
+        });
 
-    // Find matching student
-    let student = students.find(function(s){
-        return s.studentId === studentId && s.password === password;
-    });
+        const result = await response.json();
 
-    if(student){
+        if(result.success){
 
-        console.log("Logged In Student:", student); // Debug
-        console.log("CGPA Value:", student.cgpa);   // Debug
+            // Store logged in student info
+            localStorage.setItem("loggedInStudent", JSON.stringify(result));
 
-        // IMPORTANT: Store full object (including CGPA)
-        localStorage.setItem("loggedInStudent", JSON.stringify(student));
+            alert("Login Successful!");
 
-        alert("Login Successful!");
+            window.location.href = "student_dashboard.html";
 
-        window.location.href = "student_dashboard.html";
+        } else {
+            alert(result.message || "Invalid Student ID or Password");
+        }
 
-    } else {
-        alert("Invalid Student ID or Password");
+    } catch (error) {
+        console.error("Login Error:", error);
+        alert("Server Error");
     }
+
 });
 </script>
 
 </body>
-
 </html>
