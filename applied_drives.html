@@ -117,22 +117,36 @@ body{
     font-size:14px;
 }
 
-.status{
-    display:inline-block;
-    padding:6px 12px;
-    border-radius:20px;
-    font-size:13px;
-    font-weight:600;
-    background:#d1fae5;
-    color:#065f46;
-    margin-top:8px;
-}
 
 .empty{
     text-align:center;
     padding:50px;
     color:#777;
     font-size:18px;
+}
+.status{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    margin-top:8px;
+}
+
+/* NEW COLORS */
+.status.pending{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.status.selected{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+.status.rejected{
+    background:#fee2e2;
+    color:#991b1b;
 }
 </style>
 </head>
@@ -164,11 +178,25 @@ body{
 
 <script>
 
+// Get logged-in student
+let student = JSON.parse(localStorage.getItem("loggedInStudent"));
+
+if(!student){
+    alert("Please login first!");
+    window.location.href = "student_login.html";
+}
+
 // Get applied drives
 let appliedDrives = JSON.parse(localStorage.getItem("appliedDrives")) || [];
+
+// ✅ CORRECT FILTER (use student.studentId)
+let myDrives = appliedDrives.filter(d => 
+    String(d.studentId) === String(student.studentId)
+);
+
 let container = document.getElementById("appliedList");
 
-if(appliedDrives.length === 0){
+if(myDrives.length === 0){
     container.innerHTML = `
         <div class="empty">
             <i class="fas fa-folder-open fa-2x"></i>
@@ -176,7 +204,7 @@ if(appliedDrives.length === 0){
         </div>
     `;
 } else {
-    appliedDrives.forEach(drive => {
+    myDrives.forEach(drive => {
 
         container.innerHTML += `
             <div class="drive-card">
@@ -184,7 +212,14 @@ if(appliedDrives.length === 0){
                 <p><strong>Role:</strong> ${drive.role}</p>
                 <p><strong>Package:</strong> ${drive.package}</p>
                 <p><strong>Applied On:</strong> ${drive.date}</p>
-                <span class="status">Application Submitted</span>
+
+                <span class="status ${
+                    drive.status === "Selected" ? "selected" :
+                    drive.status === "Rejected" ? "rejected" :
+                    "pending"
+                }">
+                    ${drive.status || "Pending"}
+                </span>
             </div>
         `;
     });
