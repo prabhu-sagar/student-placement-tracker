@@ -204,21 +204,25 @@ Use the dashboard below to manage students, companies, placement drives, and vie
 </div>
 
 <script>
-window.onload = function() {
-    // Redirect to login page if admin is not logged in
-    if(localStorage.getItem("isAdminLoggedIn") !== "true"){
-        window.location.href = "Admin_login.html";
+document.addEventListener("DOMContentLoaded", function() {
+
+    const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
+
+    if (isLoggedIn !== "true") {
+        window.location.replace("admin_login.html");
+        return;
     }
 
-    // Attach logout to all logout buttons
-    const logoutButtons = document.querySelectorAll(".logout");
-    logoutButtons.forEach(btn => {
-        btn.addEventListener("click", function() {
-            localStorage.removeItem("isAdminLoggedIn"); // remove login state
-            window.location.href = "Admin_login.html";  // redirect to login page
+    const logoutBtn = document.querySelector(".logout");
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", function() {
+            localStorage.removeItem("isAdminLoggedIn");
+            window.location.replace("admin_login.html");
         });
-    });
-};
+    }
+
+});
 </script>
 
 </body>
