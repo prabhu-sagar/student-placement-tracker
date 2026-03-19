@@ -206,11 +206,11 @@ body::after{
 <!-- ================= HEADER ================= -->
 <div class="header">
     <div class="logo">
-        <a href="index.html">🎓 Student Placement Tracker</a>
+        <a href="home_page.html">🎓 Student Placement Tracker</a>
     </div>
 
     <div class="nav-links">
-        <a href="index.html">Home</a>
+        <a href="home_page.html">Home</a>
         <a href="statistics.html">Statistics</a>
         <a href="companies.html">Companies</a>
     </div>
@@ -257,7 +257,7 @@ body::after{
     <div>© 2026 Student Placement Tracker</div>
     <div>Developed for Campus Recruitment System</div>
     <div>
-        <a href="index.html">Home</a>
+        <a href="home_page.html">Home</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
     </div>
@@ -265,27 +265,47 @@ body::after{
 
 <!-- 🔥 LOGIN CONNECTION TO ADMIN -->
 <script>
-function login(e){
+async function login(e){
     e.preventDefault();
 
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
+    const coordinatorId = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorDiv = document.getElementById("error");
 
-    const coordinators = JSON.parse(localStorage.getItem("coordinators")) || [];
+    errorDiv.innerText = "";
 
-    const match = coordinators.find(c => c.id === user && c.pass === pass);
+    try {
+        const response = await fetch("http://localhost:5000/placement_coordinator_login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                coordinatorId: coordinatorId,
+                password: password
+            })
+        });
 
-    if(match){
-        localStorage.setItem("isCoordinatorLoggedIn", "true");
-        localStorage.setItem("coordinatorName", match.name);
-        window.location.href = "coordinator_dashboard.html";
-    }
-    else{
-        document.getElementById("error").innerText = "Invalid Coordinator ID or Password ❌";
+        const data = await response.json();
+
+        if (data.success) {
+
+            // ✅ Store login state
+            localStorage.setItem("isCoordinatorLoggedIn", "true");
+            localStorage.setItem("coordinatorName", data.name);
+
+            // ✅ Redirect
+            window.location.href = "coordinator_dashboard.html";
+        } 
+        else {
+            errorDiv.innerText = "Invalid Coordinator ID or Password ❌";
+        }
+
+    } catch (error) {
+        console.error("Server Error:", error);
+        errorDiv.innerText = "Server not responding ❌";
     }
 }
 </script>
-
 </body>
 </html>
-
