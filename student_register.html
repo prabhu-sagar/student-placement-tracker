@@ -219,7 +219,7 @@ body::after{
 </main>
 
 <script>
-document.getElementById("registerForm").addEventListener("submit", function(e){
+document.getElementById("registerForm").addEventListener("submit", async function(e){
     e.preventDefault();
 
     const password = document.getElementById("password").value;
@@ -230,18 +230,8 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
         return;
     }
 
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-
-    const studentId = document.getElementById("studentId").value;
-
-    // Prevent duplicate student ID
-    if(students.some(s => s.studentId === studentId)){
-        alert("Student ID already registered!");
-        return;
-    }
-
-    const student = {
-        studentId: studentId,
+    const studentData = {
+        studentId: document.getElementById("studentId").value,
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
         phone: document.getElementById("phone").value,
@@ -251,13 +241,31 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
         password: password
     };
 
-    students.push(student);
-    localStorage.setItem("students", JSON.stringify(students));
+    try {
 
-    alert("Registration Successful!");
-    window.location.href = "student_login.html";
+        const response = await fetch("http://localhost:5000/student_register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(studentData)
+        });
+
+        const result = await response.json();
+
+        if(result.success){
+            alert("Registration Successful!");
+            window.location.href = "student_login.html";
+        } else {
+            alert(result.message || "Registration Failed");
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Server Error");
+    }
+
 });
 </script>
-
 </body>
 </html>
