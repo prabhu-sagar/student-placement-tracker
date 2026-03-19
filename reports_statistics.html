@@ -168,43 +168,53 @@ body::before{
 </div>
 
 <script>
-/* ===== LOGIN CHECK ===== */
+/* LOGIN CHECK */
 if(localStorage.getItem("isAdminLoggedIn") !== "true"){
     window.location.href = "Admin_login.html";
 }
 
-/* ===== LOGOUT ===== */
+/* LOGOUT */
 function logout(){
     localStorage.removeItem("isAdminLoggedIn");
     window.location.href="Admin_login.html";
 }
 
-/* ================= LOAD DATA ================= */
-
+/* LOAD DATA */
 const students = JSON.parse(localStorage.getItem("students")) || [];
-const results = JSON.parse(localStorage.getItem("results")) || [];
+const appliedDrives = JSON.parse(localStorage.getItem("appliedDrives")) || [];
+const drives = JSON.parse(localStorage.getItem("drives")) || [];
 
 /* Total students */
 document.getElementById("totalStudents").innerText = students.length;
 
 /* Total placed */
-document.getElementById("totalPlaced").innerText = results.length;
+const placedStudents = appliedDrives.filter(d => d.status === "Selected");
+document.getElementById("totalPlaced").innerText = placedStudents.length;
 
 /* Placement % */
-let percent = students.length ? ((results.length/students.length)*100).toFixed(1) : 0;
+let percent = students.length ? ((placedStudents.length / students.length) * 100).toFixed(1) : 0;
 document.getElementById("placementPercent").innerText = percent + "%";
 
 /* Average package */
 let totalPackage = 0;
-results.forEach(r => totalPackage += Number(r.package || 0));
-let avg = results.length ? (totalPackage/results.length).toFixed(2) : 0;
+placedStudents.forEach(r => totalPackage += Number(r.package || 0));
+let avg = placedStudents.length ? (totalPackage / placedStudents.length).toFixed(2) : 0;
 document.getElementById("avgPackage").innerText = avg + " LPA";
 
-/* ================= COMPANY CHART ================= */
+/* ================= COMPANY CHART (FIXED) ================= */
 
 const companyCounts = {};
-results.forEach(r=>{
-    companyCounts[r.company] = (companyCounts[r.company] || 0) + 1;
+
+// ✅ Add ALL companies first
+drives.forEach(d => {
+    companyCounts[d.company] = 0;
+});
+
+// ✅ Then count selected
+placedStudents.forEach(r=>{
+    if(companyCounts[r.company] !== undefined){
+        companyCounts[r.company]++;
+    }
 });
 
 new Chart(document.getElementById("companyChart"),{
@@ -222,10 +232,10 @@ new Chart(document.getElementById("companyChart"),{
 
 const pkgRange = {"0-5":0,"5-10":0,"10+":0};
 
-results.forEach(r=>{
+placedStudents.forEach(r=>{
     const p = Number(r.package);
-    if(p<=5) pkgRange["0-5"]++;
-    else if(p<=10) pkgRange["5-10"]++;
+    if(p <= 5) pkgRange["0-5"]++;
+    else if(p <= 10) pkgRange["5-10"]++;
     else pkgRange["10+"]++;
 });
 
@@ -239,7 +249,6 @@ new Chart(document.getElementById("packageChart"),{
     }
 });
 </script>
-
 
 </body>
 </html>
