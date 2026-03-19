@@ -334,6 +334,10 @@ tbody tr:hover{
 
 <!-- JavaScript -->
 <script>
+    if(localStorage.getItem("isCoordinatorLoggedIn") !== "true"){
+    window.location.href = "placement_coordinator_login.html";
+}
+
 document.querySelector(".logout").addEventListener("click", function(){
     localStorage.removeItem("isLoggedIn");
     window.location.href = "home_page.html";
