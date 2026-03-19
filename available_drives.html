@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Dashboard | Available Drives</title>
+<title>Available Drives</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -223,19 +223,17 @@ if(drives.length === 0){
 }
 
 
-// ===== UPDATED APPLY FUNCTION (NOW STORES CGPA) =====
+// ===== UPDATED APPLY FUNCTION =====
 function applyDrive(index){
 
     let appliedDrives = JSON.parse(localStorage.getItem("appliedDrives")) || [];
     let selectedDrive = drives[index];
     let student = JSON.parse(localStorage.getItem("loggedInStudent"));
-let studentCgpa = parseFloat(student.cgpa);
 
-    // Prevent duplicate
     let alreadyApplied = appliedDrives.find(d =>
         d.company === selectedDrive.company &&
         d.role === selectedDrive.role &&
-        d.studentId === student.id
+        d.studentId === student.studentId
     );
 
     if(alreadyApplied){
@@ -243,10 +241,9 @@ let studentCgpa = parseFloat(student.cgpa);
         return;
     }
 
-    // ✅ STORE CGPA ALSO
     appliedDrives.push({
         studentName: student.name,
-        studentId: student.id,
+        studentId: student.studentId, // ✅ FIXED
         cgpa: student.cgpa,
         company: selectedDrive.company,
         role: selectedDrive.role,
