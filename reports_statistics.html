@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reports & Statistics</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
+
+body{
+    overflow-x:hidden;
+}
+
+/* Background */
+body::before{
+    content:"";
+    position:fixed;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:linear-gradient(45deg,#6366f1,#60a5fa,#a78bfa,#f472b6);
+    background-size:400% 400%;
+    animation:gradientBG 60s ease infinite;
+    z-index:-1;
+}
+@keyframes gradientBG{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* Layout */
+.layout{display:flex;min-height:100vh;}
+
+/* Sidebar */
+.sidebar{
+    width:260px;
+    background:linear-gradient(180deg,#3b82f6,#1e40af);
+    color:white;
+    padding:25px 18px;
+}
+.brand{text-align:center;margin-bottom:30px;font-size:22px;font-weight:600;}
+.sidebar ul{list-style:none;}
+.sidebar li{
+    padding:12px;
+    margin-bottom:12px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.sidebar li:hover,.active{background:rgba(255,255,255,0.2);}
+
+/* Main */
+.main{
+    flex:1;
+    padding:30px 40px;
+    background:rgba(255,255,255,0.9);
+    border-radius:20px;
+    margin:20px;
+}
+
+/* Topbar */
+.topbar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+}
+.logout{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* Cards */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+.card{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    text-align:center;
+}
+.card h3{font-size:14px;color:#555;}
+.card p{font-size:22px;font-weight:600;color:#1e3a8a;}
+
+/* Charts */
+.chart-box{
+    background:white;
+    margin-top:20px;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="brand">Admin Dashboard</h2>
+    <ul>
+        <li onclick="location.href='admin_dashboard.html'"><i class="fa fa-home"></i> Dashboard</li>
+        <li onclick="location.href='manage_students.html'"><i class="fa fa-users"></i> Manage Students</li>
+        <li onclick="location.href='manage_drives.html'"><i class="fa fa-calendar"></i> Manage Drives</li>
+        <li onclick="location.href='manage_companies.html'"><i class="fa fa-building"></i> Manage Companies</li>
+        <li onclick="location.href='manage_coordinators.html'"><i class="fa fa-user-tie"></i> Manage Coordinators</li>
+        <li class="active"><i class="fa fa-chart-column"></i> Reports & Statistics</li>
+    </ul>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+<div class="topbar">
+    <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<h1>Placement Reports & Statistics</h1>
+
+<!-- Summary -->
+<div class="cards">
+    <div class="card">
+        <h3>Total Students</h3>
+        <p id="totalStudents">0</p>
+    </div>
+    <div class="card">
+        <h3>Total Placed</h3>
+        <p id="totalPlaced">0</p>
+    </div>
+    <div class="card">
+        <h3>Placement %</h3>
+        <p id="placementPercent">0%</p>
+    </div>
+    <div class="card">
+        <h3>Average Package</h3>
+        <p id="avgPackage">0</p>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="chart-box">
+    <h3>Company Wise Selections</h3>
+    <canvas id="companyChart"></canvas>
+</div>
+
+<div class="chart-box">
+    <h3>Package Distribution</h3>
+    <canvas id="packageChart"></canvas>
+</div>
+
+</main>
+</div>
+
+<script>
+/* LOGIN CHECK */
+if(localStorage.getItem("isAdminLoggedIn") !== "true"){
+    window.location.href = "Admin_login.html";
+}
+
+/* LOGOUT */
+function logout(){
+    localStorage.removeItem("isAdminLoggedIn");
+    window.location.href="Admin_login.html";
+}
+
+/* LOAD DATA */
+const students = JSON.parse(localStorage.getItem("students")) || [];
+const appliedDrives = JSON.parse(localStorage.getItem("appliedDrives")) || [];
+const drives = JSON.parse(localStorage.getItem("drives")) || [];
+
+/* Total students */
+document.getElementById("totalStudents").innerText = students.length;
+
+/* Total placed */
+const placedStudents = appliedDrives.filter(d => d.status === "Selected");
+document.getElementById("totalPlaced").innerText = placedStudents.length;
+
+/* Placement % */
+let percent = students.length ? ((placedStudents.length / students.length) * 100).toFixed(1) : 0;
+document.getElementById("placementPercent").innerText = percent + "%";
+
+/* Average package */
+let totalPackage = 0;
+placedStudents.forEach(r => totalPackage += Number(r.package || 0));
+let avg = placedStudents.length ? (totalPackage / placedStudents.length).toFixed(2) : 0;
+document.getElementById("avgPackage").innerText = avg + " LPA";
+
+/* ================= COMPANY CHART (FIXED) ================= */
+
+const companyCounts = {};
+
+// ✅ Add ALL companies first
+drives.forEach(d => {
+    companyCounts[d.company] = 0;
+});
+
+// ✅ Then count selected
+placedStudents.forEach(r=>{
+    if(companyCounts[r.company] !== undefined){
+        companyCounts[r.company]++;
+    }
+});
+
+new Chart(document.getElementById("companyChart"),{
+    type:"bar",
+    data:{
+        labels:Object.keys(companyCounts),
+        datasets:[{
+            label:"Selections",
+            data:Object.values(companyCounts)
+        }]
+    }
+});
+
+/* ================= PACKAGE CHART ================= */
+
+const pkgRange = {"0-5":0,"5-10":0,"10+":0};
+
+placedStudents.forEach(r=>{
+    const p = Number(r.package);
+    if(p <= 5) pkgRange["0-5"]++;
+    else if(p <= 10) pkgRange["5-10"]++;
+    else pkgRange["10+"]++;
+});
+
+new Chart(document.getElementById("packageChart"),{
+    type:"pie",
+    data:{
+        labels:Object.keys(pkgRange),
+        datasets:[{
+            data:Object.values(pkgRange)
+        }]
+    }
+});
+</script>
+
+</body>
+</html>

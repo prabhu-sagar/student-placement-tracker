@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Coordinators</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
+}
+
+body{
+    display:flex;
+    background:linear-gradient(120deg,#e0f2fe,#dbeafe);
+    min-height:100vh;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar{
+    width:250px;
+    background:linear-gradient(180deg,#3b82f6,#1e40af);
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2{
+    margin-bottom:25px;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar li{
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.sidebar li:hover,
+.active{
+    background:rgba(255,255,255,0.2);
+}
+
+/* ================= MAIN ================= */
+.main{
+    flex:1;
+    padding:25px;
+}
+
+/* content card */
+.content{
+    background:white;
+    border-radius:18px;
+    padding:25px;
+    min-height:90vh;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* header */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.logout{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* titles */
+h1{
+    margin-bottom:5px;
+    color:#1e3a8a;
+}
+
+.subtitle{
+    color:gray;
+    margin-bottom:20px;
+}
+
+/* ================= FORM ================= */
+.form-box{
+    margin-bottom:25px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+input{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #cbd5e1;
+    width:100%;
+}
+
+.btn{
+    margin-top:15px;
+    padding:10px 15px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* ================= TABLE ================= */
+.table-box{
+    margin-top:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    overflow:hidden;
+    border-radius:12px;
+}
+
+thead{
+    background:#3b82f6;
+    color:white;
+}
+
+th,td{
+    padding:12px;
+    text-align:left;
+}
+
+tbody tr{
+    border-bottom:1px solid #eee;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <ul>
+        <li onclick="location.href='admin_dashboard.html'"><i class="fa fa-home"></i> Dashboard</li>
+        <li onclick="location.href='manage_students.html'"><i class="fa fa-users"></i> Manage Students</li>
+        <li onclick="location.href='manage_drives.html'"><i class="fa fa-calendar"></i> Manage Drives</li>
+        <li onclick="location.href='manage_companies.html'"><i class="fa fa-building"></i> Manage Companies</li>
+        <li class="active"><i class="fa fa-user-tie"></i> Manage Coordinators</li>
+        <li onclick="location.href='reports_statistics.html'"><i class="fa fa-chart-bar"></i> Reports & Statistics</li>
+    </ul>
+</div>
+
+<!-- ================= MAIN ================= -->
+<div class="main">
+    <div class="content">
+
+        <!-- TOP -->
+        <div class="topbar">
+            <div>
+                <h1>Manage Coordinators</h1>
+                <div class="subtitle">Create or remove placement coordinator accounts.</div>
+            </div>
+
+            <button class="logout" onclick="logout()">
+                <i class="fa fa-power-off"></i> Logout
+            </button>
+        </div>
+
+        <!-- ADD -->
+        <div class="form-box">
+            <h3>Add New Coordinator</h3>
+
+            <div class="grid">
+                <input type="text" placeholder="Coordinator ID" id="cid">
+                <input type="text" placeholder="Name" id="cname">
+                <input type="email" placeholder="Email" id="cemail">
+                <input type="password" placeholder="Password" id="cpass">
+            </div>
+
+            <button class="btn" onclick="addCoordinator()">Add Coordinator</button>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-box">
+            <h3>Existing Coordinators</h3>
+
+            <table id="coordTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function logout(){
+    window.location.href="placement_coordinator_login.html";
+}
+
+const tbody=document.querySelector("#coordTable tbody");
+
+window.onload=function(){
+    loadData();
+};
+
+function loadData(){
+    const data=JSON.parse(localStorage.getItem("coordinators")) || [];
+    tbody.innerHTML="";
+
+    data.forEach((c,index)=>{
+        const row=document.createElement("tr");
+        row.innerHTML=`
+            <td>${c.id}</td>
+            <td>${c.name}</td>
+            <td>${c.email}</td>
+            <td><button class="delete-btn" onclick="deleteCoord(${index})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function addCoordinator(){
+    const id=document.getElementById("cid").value;
+    const name=document.getElementById("cname").value;
+    const email=document.getElementById("cemail").value;
+    const pass=document.getElementById("cpass").value;
+
+    if(id==""||name==""||email==""||pass==""){
+        alert("Fill all fields");
+        return;
+    }
+
+    const data=JSON.parse(localStorage.getItem("coordinators")) || [];
+    data.push({id,name,email,pass});
+    localStorage.setItem("coordinators",JSON.stringify(data));
+
+    alert("Coordinator Added ✅");
+
+    loadData();
+    document.getElementById("cid").value="";
+    document.getElementById("cname").value="";
+    document.getElementById("cemail").value="";
+    document.getElementById("cpass").value="";
+}
+
+function deleteCoord(index){
+    const data=JSON.parse(localStorage.getItem("coordinators")) || [];
+    data.splice(index,1);
+    localStorage.setItem("coordinators",JSON.stringify(data));
+    loadData();
+}
+</script>
+
+</body>
+</html>
